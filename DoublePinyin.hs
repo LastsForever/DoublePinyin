@@ -20,9 +20,10 @@ getRandomIndices xs = case length xs of
     0 -> getRandomIndex >>= getRandomIndices . (: [])
     4 -> (: xs) <$> randomRIO (1, 4)
     _ -> getRandomIndex >>= \x ->
-            if x `elem` xs 
-            then getRandomIndices xs
-            else getRandomIndices $ x : xs
+            if x `elem` xs then 
+                getRandomIndices xs
+            else 
+                getRandomIndices $ x : xs
     where   getRandomIndex :: IO Int
             getRandomIndex = randomRIO (0, length records - 1)
 
