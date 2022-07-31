@@ -1,34 +1,34 @@
+{-# LANGUAGE TemplateHaskell #-}
 import Data.List (intercalate)
 import Data.List.Split (splitOn)
+import Data.FileEmbed (embedFile)
+import Data.ByteString.UTF8 (toString)
+import Data.Function ((&))
 import System.Random (randomRIO)
 
 data Record = Record { key   :: String
                      , value :: String}
 
-getRecords :: IO [Record]
-getRecords =
-    readFile "Records.csv"
-    >>= return . tail . lines
-    >>= return . map (splitOn ",")
-    >>= return . map (\[x, y] -> Record y x)
+records :: [Record]
+records = $(embedFile "Records.csv")
+    & tail . lines . toString
+    & map (splitOn ",")
+    & map (\[x, y] -> Record y x)
 
-getRandomIndices :: [Record] -> [Int] -> IO [Int]
-getRandomIndices records xs = case length xs of
-    0 -> (: []) <$> getRandomIndex 
-            >>= getRandomIndices records
+getRandomIndices :: [Int] -> IO [Int]
+getRandomIndices xs = case length xs of
+    0 -> getRandomIndex >>= getRandomIndices . (: [])
     4 -> (: xs) <$> randomRIO (1, 4)
     _ -> getRandomIndex >>= \x ->
-            if x `elem` xs then
-                getRandomIndices records xs
-            else
-                getRandomIndices records $ x : xs
+            if x `elem` xs 
+            then getRandomIndices xs
+            else getRandomIndices $ x : xs
     where   getRandomIndex :: IO Int
             getRandomIndex = randomRIO (0, length records - 1)
 
 qna :: IO Bool
 qna = do
-    records <- getRecords
-    indices <- getRandomIndices records []
+    indices <- getRandomIndices []
     let correctIndex = head indices
     let correctRecord = records !! (indices !! correctIndex)
     let correctKey = key correctRecord
