@@ -54,7 +54,7 @@ quiz xs n = case n of
 
 main :: IO ()
 main = do
-    putStrLn "Double Pinyin Quiz!\nHow many tests would you like?\n[1]5\t[2]10\t[3]20\t[4]50\t[(Ohter Answer)]Quit"
+    putStrLn "Double Pinyin Quiz!\nHow many tests would you like?\n[1]5\t[2]10\t[3]20\t[4]50\t[(Other Input)]Quit"
     answer <- getChar
     _ <- getLine
     case answer of
